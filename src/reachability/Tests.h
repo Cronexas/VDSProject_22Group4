@@ -137,27 +137,27 @@ TEST_F(ReachabilityTest, isReachableFunctionalityTest) { // NOLINT
     fsm2->setTransitionFunctions(transitionFunctions);
 
     fsm2->setInitState({false,false});//State A
-    EXPECT_TRUE(fsm2->isReachable({false, false}));
-    EXPECT_FALSE(fsm2->isReachable({false, true}));
-    EXPECT_TRUE(fsm2->isReachable({true, false}));
-    EXPECT_FALSE(fsm2->isReachable({true, true}));
+    EXPECT_TRUE(fsm2->isReachable({false, false}));//A is always reachable
+    EXPECT_FALSE(fsm2->isReachable({false, true}));//C is not reachable from A
+    EXPECT_TRUE(fsm2->isReachable({true, false}));//B is always reachable
+    EXPECT_FALSE(fsm2->isReachable({true, true}));//D is never reachable
 
     fsm2->setInitState({true,false});//State B
-    EXPECT_TRUE(fsm2->isReachable({false, false}));
-    EXPECT_FALSE(fsm2->isReachable({false, true}));
-    EXPECT_TRUE(fsm2->isReachable({true, false}));
-    EXPECT_FALSE(fsm2->isReachable({true, true}));
+    EXPECT_TRUE(fsm2->isReachable({false, false}));//A is always reachable
+    EXPECT_FALSE(fsm2->isReachable({false, true}));//C is not reachable from B
+    EXPECT_TRUE(fsm2->isReachable({true, false}));//B is always reachable
+    EXPECT_FALSE(fsm2->isReachable({true, true}));//D is never reachable
 
     fsm2->setInitState({false,true});//State C
-    EXPECT_TRUE(fsm2->isReachable({false, false}));
-    EXPECT_TRUE(fsm2->isReachable({false, true}));
-    EXPECT_TRUE(fsm2->isReachable({true, false}));
-    EXPECT_FALSE(fsm2->isReachable({true, true}));
+    EXPECT_TRUE(fsm2->isReachable({false, false}));//A is always reachable
+    EXPECT_TRUE(fsm2->isReachable({false, true}));//C is reachable from C
+    EXPECT_TRUE(fsm2->isReachable({true, false}));//B is always reachable
+    EXPECT_FALSE(fsm2->isReachable({true, true}));//D is never reachable
 
     fsm2->setInitState({true,true});//State D
-    EXPECT_TRUE(fsm2->isReachable({false, false}));
-    EXPECT_TRUE(fsm2->isReachable({false, true}));
-    EXPECT_TRUE(fsm2->isReachable({true, false}));
-    EXPECT_TRUE(fsm2->isReachable({true, true}));
+    EXPECT_TRUE(fsm2->isReachable({false, false}));//A is always reachable
+    EXPECT_TRUE(fsm2->isReachable({false, true}));//C is reachable from D
+    EXPECT_TRUE(fsm2->isReachable({true, false}));//B is always reachable
+    EXPECT_TRUE(fsm2->isReachable({true, true}));//D is reachable from D
 }
 #endif

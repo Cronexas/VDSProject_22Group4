@@ -12,7 +12,7 @@ Reachability::Reachability(unsigned int stateSize) : ReachabilityInterface(state
 
     if(stateSize==0)//We need to have atleast 1 state!
         throw std::runtime_error("Run-time_error: Size of state is zero!");
-    for(int count=0; count<stateSize; count++)//create states s_i from 0 to state-size-1
+    for(int count=0; count<stateSize; count++)//create states s_i from 0 to state-size-1 and s_i'
     {
         state_name = "s" + std::to_string(count);//create label
         bddIDVariable = createVar(state_name);
@@ -22,7 +22,7 @@ Reachability::Reachability(unsigned int stateSize) : ReachabilityInterface(state
         trans_func.push_back(bddIDVariable);
         init_state.push_back(false);
         next_state_name = "s" + std::to_string(count) + "'";
-        bddIDVariable = createVar(state_name);
+        bddIDVariable = createVar(next_state_name);
         next_state_bits.push_back(bddIDVariable);
     }
 }
@@ -39,7 +39,7 @@ bool Reachability::isReachable(const std::vector<bool> &stateVector)//slide 5-3
     //3 in part3
     BDD_ID Tau = calcTau();// correct
     //4 and 5 in part 3
-    BDD_ID c_r_it = characteristicFunction();//correct
+    BDD_ID c_r_it = characteristicFunction();//5 correct
     BDD_ID c_r,temp_ir,img_s_dot,img_s,temp1,temp2;
     //You can also compare the lines before to script 5-10
     //here you can see the next step, which are described in part3 too.
@@ -47,11 +47,16 @@ bool Reachability::isReachable(const std::vector<bool> &stateVector)//slide 5-3
     do
     {
         c_r = c_r_it;//6 in part 3
+
         temp_ir = and2(c_r,Tau);//7 in part 3 //correct
+
         img_s_dot= img_not_s_func(temp_ir);//7 in part 3 //correct
+
         img_s    = img_s_func(img_s_dot);//8 in part 3 //correct
+
         c_r_it = or2(c_r,img_s);// 9 in part 3 //correct
     }while(c_r!=c_r_it);//10 in part3 fixed point reached
+
     for(int count = 0; count < state_bits.size(); count++)//11 in part3
     {
         if(stateVector[count])
@@ -99,7 +104,7 @@ BDD_ID Reachability::calcTau()
     }
     return temp1;
 }
-BDD_ID Reachability::characteristicFunction()
+BDD_ID Reachability::characteristicFunction()//4 in part3
 {
     BDD_ID temp1,temp2;
     //bool to bdd_id
@@ -138,6 +143,7 @@ BDD_ID Reachability::img_s_func(BDD_ID f)
         temp2 = xnor2(state_bits[count], next_state_bits[count]);
         temp1 =and2(temp1, temp2);
     }
+
     for(int count=state_bits.size()-1; count >= 0 ; count--)
     {
         temp1 = exist_quant(temp1, next_state_bits[count]);

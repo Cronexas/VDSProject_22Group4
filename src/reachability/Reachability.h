@@ -63,7 +63,7 @@ namespace ClassProject
         BDD_ID img(BDD_ID f);
         BDD_ID img_nxt(BDD_ID f);
     */
-     /*
+    /*
     private:
         std::vector<BDD_ID> states;
         std::vector<BDD_ID> next_states;

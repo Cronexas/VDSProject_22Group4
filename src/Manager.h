@@ -19,7 +19,6 @@ namespace ClassProject {
     struct BDDEntry
     {
         std::string Varname_Entry;
-        BDD_ID BDD_ID_Entry;
         BDD_ID High_Entry;
         BDD_ID Low_Entry;
         BDD_ID TopVar_Entry;

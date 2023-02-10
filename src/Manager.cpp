@@ -1,9 +1,5 @@
 #include "Manager.h"
-#include <vector>
 #include <string>
-#include <iostream>
-#include <Manager.h>
-#include <unordered_map>
 
 using namespace ClassProject;
 
@@ -84,32 +80,6 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     {
         return e;
     }
-    /*
-    else if(t==False() && e==True())
-    {   //find all top notes of the function we'd like to negate.
-        std::set<BDD_ID> test;
-        std::set<BDD_ID>:: iterator it;
-        findVars(i,test);
-        int size_test=test.size();
-        BDD_ID ans[size_test];
-        it = test.end();
-        for(BDD_ID counter_test=size_test;counter_test>0;counter_test--)
-        {
-            ans[counter_test-1]=*it;
-        }
-        it = test.begin();
-        //ans = *it;
-        createNode("",uniqueTableSize(),True(),False(),ans[test.size()]);
-        for(BDD_ID counter_neg=test.size();0<counter_neg;counter_neg--)
-        {
-            createNode("",uniqueTableSize(),True(),uniqueTableSize()-1,ans[counter_neg]);
-        }
-        return createNode("",uniqueTableSize(),uniqueTableSize(),uniqueTableSize()-2,ans[0]);
-    }
-    */
-    //we just check for the exact same pattern so far.
-    //Maybe we can advance that somehow to also check for patterns not exactly included in the computeted table,
-    //but represented by the same boolean function
         //Standard triples
 
         //ite(F,F,G)->ite(F,1,G)
@@ -122,17 +92,7 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
         {
             e = False();
         }
-        /*
-        //ite(F,G,not(F))->ite(F,G,1)
-        else if (i == topVar(e) && i != t)
-        {
-            e = True();
-        }
-        //ite(F,not(F),G)->ite(F,0,G)
-        else if (i == topVar(t) && i != e) {
-            t = False();
-        }
-         */
+
     BDD_ID i_temp=i;
     BDD_ID t_temp=t;
     BDD_ID e_temp=e;
@@ -151,50 +111,6 @@ BDD_ID Manager::ite(BDD_ID i, BDD_ID t, BDD_ID e)
     {
         return COMPTable[CompKey];
     }
-/*
-    if(t==False() && e==True())
-    {
-        //find all top notes of the function we'd like to negate.
-        //Creating set needed for findVars, to get every TopVar of i.
-        std::set<BDD_ID> test;
-        //the iterator is needed in the loop to access the elements in test.
-        std::set<BDD_ID>:: iterator it;
-        //access the findVars
-        findVars(i,test);
-        //The first node we create has the highest topVar. the last node the create has the lowest topVar
-        it = test.end();
-        //get the size of the set test, so we know how much entries we need to allocate for the topVar.
-        int size_test = test.size();
-        //initaliese an array that holds all values, but in the opposite order compared to test.
-        BDD_ID ans[size_test];
-        //std::cout << size_test << std::endl; //debugging purpose
-        int ans_it = 0;
-        do
-        {
-            it--;
-            if(it != test.end())
-            {
-                ans[ans_it]  = *it;
-            }
-            ans_it++;
-        }while(it!=test.begin());
-        for(int loop_counter=0;loop_counter<size_test;loop_counter++)
-        {
-            if (loop_counter==0)
-            {
-                createNode("",uniqueTableSize(),True(),False(),ans[loop_counter]);
-            }
-            else if(loop_counter<size_test-1)
-            {
-                createNode("",uniqueTableSize(),True(),uniqueTableSize()-1,ans[loop_counter]);
-            }
-            else
-            {
-                return createNode("",uniqueTableSize(),uniqueTableSize()-1,uniqueTableSize()-2,ans[loop_counter]);
-            }
-        }
-    }
-*/
     //}
 
     //Get the smallest value of topvariable from entry i, t and e
@@ -306,15 +222,15 @@ BDD_ID Manager::coFactorFalse(BDD_ID f, BDD_ID x)
         return f;
     }
     size_t key = CalcCoFactorKey(f,x);
-    if(CoFactorTrue_hash.find(key)==CoFactorTrue_hash.end())
+    if(CoFactorFalse_hash.find(key)==CoFactorFalse_hash.end())
     {
         BDD_ID T = coFactorFalse(GetHigh(f), x);
         BDD_ID F = coFactorFalse(GetLow(f), x);
         BDD_ID ID_ite= ite(topVar(f),T, F);
-        CoFactorTrue_hash[key]=ID_ite;
+        CoFactorFalse_hash[key]=ID_ite;
         return ID_ite;
     }
-    return CoFactorTrue_hash[key];
+    return CoFactorFalse_hash[key];
 }
 //The following 2 functions describe behaviour if x isn't described.
 //basically if just call the function coFactorTrue/False with one parameter, we call the function
@@ -449,7 +365,7 @@ BDD_ID Manager::createNode(std::string NodeName, BDD_ID NodeID, BDD_ID NodeLow, 
 {
     // add element to the end of BDDTable, we use class constructor for that
     //BDDTable.push_back({NodeName, NodeID, NodeHigh, NodeLow, NodeTop});
-    BDDTable[NodeID]={NodeName, NodeID, NodeHigh, NodeLow, NodeTop};
+    BDDTable[NodeID]={NodeName, NodeHigh, NodeLow, NodeTop};
     size_t BDDKey= CalcCompKey(NodeTop,NodeLow,NodeHigh);
     BDDTable_hash[BDDKey]=NodeID;
     //ID is always position -1
@@ -479,16 +395,6 @@ BDD_ID Manager::find_or_add_unique_table(BDD_ID x,BDD_ID rLow,BDD_ID rHigh)
         return createNode("",uniqueTableSize(),rLow,rHigh,x);
     }
     return BDDTable_hash[BDDKey];
-    /*
-    for (auto & loop_object : BDDTable)
-    {
-        if (loop_object.TopVar_Entry==x && loop_object.Low_Entry==rLow && loop_object.High_Entry==rHigh)
-        {
-            return loop_object.BDD_ID_Entry;
-        }
-    }
-    return createNode("",uniqueTableSize(),rLow,rHigh,x);
-     */
 }
 
 //Add Entry to Computed Table with the ID f,g,h and r.
